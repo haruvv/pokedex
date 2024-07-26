@@ -1,5 +1,5 @@
-import { Haedline } from "@/components/Headline";
-import { Links } from "@/components/Links";
+import { Haedline } from '@/components/Headline';
+import { Links } from '@/components/Links';
 
 export default function Home() {
   return (

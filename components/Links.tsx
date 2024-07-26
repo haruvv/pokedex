@@ -1,9 +1,9 @@
-import Image from "next/image";
+import Image from 'next/image';
 
 export function Links() {
   return (
     <>
-    <h1>ちゃむらむら</h1>
+      <h1>bi------</h1>
     </>
   );
 }
