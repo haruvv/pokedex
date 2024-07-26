@@ -1,6 +1,6 @@
 import { ReactElement, JSXElementConstructor, ReactNode, ReactPortal, AwaitedReactNode } from "react";
 
-export default function Haedline(props: { title: string }) {
+export function Haedline(props: { title: string }) {
   return (
     <>
       <h1>あーーーーー</h1>
