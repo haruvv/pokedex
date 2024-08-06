@@ -1,23 +1,22 @@
-// src/app/page.tsx
-import Link from 'next/link';
 import Pokedex, { Pokemon } from 'pokedex-promise-v2';
 
-async function fetchPokemons(): Promise<Pokemon[]> {
+async function fetchAllPokemons(): Promise<Pokemon[]> {
   const P = new Pokedex();
-  // ここでは最初の10件を取得する例
-  const pokemons = await P.getPokemonsList({ limit: 1000 });
-  const pokemonDetails = await Promise.all(
-    pokemons.results.map((pokemon) => P.getPokemonByName(pokemon.name))
+  const allPokemonsList = await P.getPokemonsList({ limit: 10000 }); // 大きなlimit値で全てを取得
+
+  const allPokemons = await Promise.all(
+    allPokemonsList.results.map((pokemon) => P.getPokemonByName(pokemon.name))
   );
-  return pokemonDetails;
+
+  return allPokemons;
 }
 
-export default async function HomePage() {
-  const pokemons = await fetchPokemons();
+export default async function AllPokemonPage() {
+  const pokemons = await fetchAllPokemons();
 
   return (
     <div>
-      <h1>Pokemon List</h1>
+      <h1>All Pokémon</h1>
       <div style={{ display: 'flex', flexWrap: 'wrap' }}>
         {pokemons.map((pokemon) => (
           <div
@@ -25,8 +24,11 @@ export default async function HomePage() {
             style={{ margin: '10px', border: '1px solid #ccc', padding: '10px', width: '150px' }}
           >
             <h2>{pokemon.name}</h2>
-            <img src={pokemon.sprites.front_default} alt={pokemon.name} />
-            <Link href={`/pokemon/${pokemon.name}`}>See Details</Link>
+            {pokemon.sprites.front_default ? (
+              <img src={pokemon.sprites.front_default} alt={pokemon.name} />
+            ) : (
+              <p>No image available</p>
+            )}
           </div>
         ))}
       </div>

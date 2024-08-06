@@ -12,7 +12,10 @@ export default async function PokemonDetailPage({ params }: { params: { name: st
   return (
     <div>
       <h1>{pokemon.name}</h1>
-      <img src={pokemon.sprites.front_default} alt={pokemon.name} />
+      <img
+        src={pokemon.sprites.front_default ?? '/path/to/placeholder/image.png'}
+        alt={pokemon.name}
+      />
       <p>Base Experience: {pokemon.base_experience}</p>
       <p>Height: {pokemon.height}</p>
       <p>Weight: {pokemon.weight}</p>
