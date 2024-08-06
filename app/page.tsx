@@ -1,18 +1,35 @@
-import { Haedline } from '@/components/Headline';
-import { Links } from '@/components/Links';
+// src/app/page.tsx
+import Link from 'next/link';
+import Pokedex, { Pokemon } from 'pokedex-promise-v2';
 
-export default function Home() {
+async function fetchPokemons(): Promise<Pokemon[]> {
+  const P = new Pokedex();
+  // ここでは最初の10件を取得する例
+  const pokemons = await P.getPokemonsList({ limit: 1000 });
+  const pokemonDetails = await Promise.all(
+    pokemons.results.map((pokemon) => P.getPokemonByName(pokemon.name))
+  );
+  return pokemonDetails;
+}
+
+export default async function HomePage() {
+  const pokemons = await fetchPokemons();
+
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <Haedline
-        title="index Page"
-        number={11111}
-        array={['1', '2', 'S']}
-        obj={{ foo: 'foo', key: 'key', id: 1 }}
-        boo={true}
-        cmp={<p>hoo</p>}
-      />
-      <Links />
-    </main>
+    <div>
+      <h1>Pokemon List</h1>
+      <div style={{ display: 'flex', flexWrap: 'wrap' }}>
+        {pokemons.map((pokemon) => (
+          <div
+            key={pokemon.name}
+            style={{ margin: '10px', border: '1px solid #ccc', padding: '10px', width: '150px' }}
+          >
+            <h2>{pokemon.name}</h2>
+            <img src={pokemon.sprites.front_default} alt={pokemon.name} />
+            <Link href={`/pokemon/${pokemon.name}`}>See Details</Link>
+          </div>
+        ))}
+      </div>
+    </div>
   );
 }
