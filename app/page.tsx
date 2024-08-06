@@ -1,22 +1,22 @@
+// src/app/page.tsx
+import Link from 'next/link';
 import Pokedex, { Pokemon } from 'pokedex-promise-v2';
 
-async function fetchAllPokemons(): Promise<Pokemon[]> {
+async function fetchPokemons(): Promise<Pokemon[]> {
   const P = new Pokedex();
-  const allPokemonsList = await P.getPokemonsList({ limit: 10000 }); // 大きなlimit値で全てを取得
-
-  const allPokemons = await Promise.all(
-    allPokemonsList.results.map((pokemon) => P.getPokemonByName(pokemon.name))
+  const pokemons = await P.getPokemonsList();
+  const pokemonDetails = await Promise.all(
+    pokemons.results.map((pokemon) => P.getPokemonByName(pokemon.name))
   );
-
-  return allPokemons;
+  return pokemonDetails;
 }
 
-export default async function AllPokemonPage() {
-  const pokemons = await fetchAllPokemons();
+export default async function HomePage() {
+  const pokemons = await fetchPokemons();
 
   return (
     <div>
-      <h1>All Pokémon</h1>
+      <h1>Pokemon List</h1>
       <div style={{ display: 'flex', flexWrap: 'wrap' }}>
         {pokemons.map((pokemon) => (
           <div
@@ -27,8 +27,9 @@ export default async function AllPokemonPage() {
             {pokemon.sprites.front_default ? (
               <img src={pokemon.sprites.front_default} alt={pokemon.name} />
             ) : (
-              <p>No image available</p>
+              <div>No Image Available</div>
             )}
+            <Link href={`/pokemon/${pokemon.name}`}>See Details</Link>
           </div>
         ))}
       </div>

@@ -1,16 +1,22 @@
-// types/pokedex.d.ts
+// src/types/pokedex.d.ts
 declare module 'pokedex-promise-v2' {
+  export interface NamedAPIResourceList {
+    results: { name: string }[];
+  }
+
   export interface Pokemon {
+    id: number;
     name: string;
     base_experience: number;
     height: number;
     weight: number;
-    // 他の必要なフィールドをここに追加
+    abilities: { ability: { name: string } }[];
+    sprites: { front_default: string | null };
   }
 
   class Pokedex {
     getPokemonByName(name: string): Promise<Pokemon>;
-    // 他のメソッドをここに追加
+    getPokemonsList(options?: { limit?: number }): Promise<NamedAPIResourceList>;
   }
 
   export default Pokedex;
