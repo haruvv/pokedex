@@ -22,22 +22,30 @@ export default async function PokemonDetailPage({ params }: { params: { name: st
   const nextPokemon = await fetchPokemonByName(nextPokemonId.toString());
 
   return (
-    <div>
-      <h1>{pokemon.name}</h1>
+    <div className="container mx-auto p-8">
+      <h1 className="text-4xl font-bold text-center mb-8">{pokemon.name}</h1>
       {pokemon.sprites.front_default ? (
-        <img src={pokemon.sprites.front_default} alt={pokemon.name} />
+        <img src={pokemon.sprites.front_default} alt={pokemon.name} className="mx-auto mb-8" />
       ) : (
-        <div>No Image Available</div>
+        <div className="text-center mb-8">No Image Available</div>
       )}
-      <p>Base Experience: {pokemon.base_experience}</p>
-      <p>Height: {pokemon.height}</p>
-      <p>Weight: {pokemon.weight}</p>
-      <p>Abilities: {pokemon.abilities.map((ability) => ability.ability.name).join(', ')}</p>
+      <div className="text-center mb-8">
+        <p className="text-xl mb-4">Base Experience: {pokemon.base_experience}</p>
+        <p className="text-xl mb-4">Height: {pokemon.height}</p>
+        <p className="text-xl mb-4">Weight: {pokemon.weight}</p>
+        <p className="text-xl">
+          Abilities: {pokemon.abilities.map((ability) => ability.ability.name).join(', ')}
+        </p>
+      </div>
 
       {/* 前のポケモンと次のポケモンへのリンク */}
-      <div style={{ marginTop: '20px' }}>
-        <Link href={`/pokemon/${previousPokemon.name}`}>Previous: {previousPokemon.name}</Link>
-        <Link href={`/pokemon/${nextPokemon.name}`}>Next: {nextPokemon.name}</Link>
+      <div className="flex justify-between mt-8">
+        <Link href={`/pokemon/${previousPokemon.name}`} className="text-blue-500 hover:underline">
+          Previous: {previousPokemon.name}
+        </Link>
+        <Link href={`/pokemon/${nextPokemon.name}`} className="text-blue-500 hover:underline">
+          Next: {nextPokemon.name}
+        </Link>
       </div>
     </div>
   );

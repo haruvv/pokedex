@@ -16,7 +16,7 @@ declare module 'pokedex-promise-v2' {
 
   class Pokedex {
     getPokemonByName(name: string): Promise<Pokemon>;
-    getPokemonsList(options?: { limit?: number }): Promise<NamedAPIResourceList>;
+    getPokemonsList(options?: { limit?: number; offset?: number }): Promise<NamedAPIResourceList>;
   }
 
   export default Pokedex;
