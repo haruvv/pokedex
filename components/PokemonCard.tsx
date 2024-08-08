@@ -7,23 +7,23 @@ import { Pokemon } from 'pokedex-promise-v2';
 
 // タイプごとの色を定義
 const typeColors: { [key: string]: string } = {
-  fire: '#F08030', // ほのお
-  water: '#6890F0', // みず
-  grass: '#78C850', // くさ
-  electric: '#F8D030', // でんき
-  ice: '#98D8D8', // こおり
-  fighting: '#C03028', // かくとう
-  poison: '#A040A0', // どく
-  ground: '#E0C068', // じめん
-  flying: '#A890F0', // ひこう
-  psychic: '#F85888', // エスパー
-  bug: '#A8B820', // むし
-  rock: '#B8A038', // いわ
-  ghost: '#705898', // ゴースト
-  dragon: '#7038F8', // ドラゴン
-  dark: '#705848', // あく
-  steel: '#B8B8D0', // はがね
-  fairy: '#F0B6BC', // フェアリー
+  fire: '#F08030',
+  water: '#6890F0',
+  grass: '#78C850',
+  electric: '#F8D030',
+  ice: '#98D8D8',
+  fighting: '#C03028',
+  poison: '#A040A0',
+  ground: '#E0C068',
+  flying: '#A890F0',
+  psychic: '#F85888',
+  bug: '#A8B820',
+  rock: '#B8A038',
+  ghost: '#705898',
+  dragon: '#7038F8',
+  dark: '#705848',
+  steel: '#B8B8D0',
+  fairy: '#F0B6BC',
 };
 
 interface PokemonCardProps {
@@ -45,7 +45,8 @@ export default function PokemonCard({ pokemon }: PokemonCardProps) {
 
   return (
     <div
-      className="p-4 border border-gray-300 rounded-lg w-40 shadow-lg transition-transform transform hover:scale-105 cursor-pointer"
+      className="p-4 border border-gray-300 rounded-lg shadow-lg transition-transform transform hover:scale-105 active:scale-95 active:shadow-sm cursor-pointer
+                 sm:w-32 sm:h-48 md:w-40 md:h-56 lg:w-40 lg:h-56"
       onClick={handleClick}
     >
       {pokemon.sprites.front_default ? (
@@ -60,7 +61,9 @@ export default function PokemonCard({ pokemon }: PokemonCardProps) {
       ) : (
         <div className="text-center mb-2">No Image Available</div>
       )}
-      <h2 className="text-xl font-semibold text-center mb-2">{pokemon.japaneseName}</h2>
+      <h2 className="text-lg font-light text-center mb-2 font-sans text-gray-800">
+        {pokemon.japaneseName}
+      </h2>
       <div className="flex flex-wrap justify-center gap-2">
         {types.map((type) => (
           <span

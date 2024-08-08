@@ -22,7 +22,7 @@ export default function PokemonList({ pokemons, page }: PokemonListProps) {
   return (
     <div className="container mx-auto">
       <h1 className="text-3xl font-bold text-center my-8">Pokemon List</h1>
-      <div className="flex flex-wrap justify-center gap-4">
+      <div className="flex flex-wrap justify-center gap-3">
         {pokemons.map((pokemon) => (
           <PokemonCard key={pokemon.name} pokemon={pokemon} />
         ))}

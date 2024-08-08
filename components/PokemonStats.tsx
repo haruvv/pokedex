@@ -27,10 +27,10 @@ export default function PokemonStats({ pokemon }: PokemonStatsProps) {
       {
         label: 'Base Stats',
         data: pokemon.stats.map((stat) => stat.base_stat),
-        backgroundColor: 'rgba(75, 192, 192, 0.2)',
-        borderColor: 'rgba(75, 192, 192, 1)',
-        pointBackgroundColor: 'rgba(75, 192, 192, 1)',
+        backgroundColor: 'rgba(0, 0, 0, 0.1)', // 背景色を薄い灰色に
+        borderColor: 'rgba(169, 169, 169, 0.9)', // 線の色を灰色に
         borderWidth: 2,
+        pointRadius: 0, // プロットを非表示
       },
     ],
   };
@@ -47,26 +47,45 @@ export default function PokemonStats({ pokemon }: PokemonStatsProps) {
           display: false, // 数字を表示しない
         },
         grid: {
-          color: 'rgba(0, 0, 0, 0.1)', // グリッドラインの色を薄く設定
+          color: 'rgba(169, 169, 169, 0.3)', // グリッドラインの色を灰色に
+          lineWidth: 1, // グリッドラインの幅を細く設定
         },
         angleLines: {
-          color: 'rgba(0, 0, 0, 0.2)', // 軸のラインの色を設定
+          color: 'rgba(169, 169, 169, 0.5)', // 軸のラインの色を灰色に
+          lineWidth: 1, // 軸のラインの幅を細く設定
         },
+      },
+    },
+    elements: {
+      line: {
+        tension: 0, // 線の曲線を直線に設定
+        borderWidth: 2, // 線の幅を設定
+        borderColor: 'rgba(169, 169, 169, 0.9)', // 線の色を灰色に
+      },
+    },
+    plugins: {
+      legend: {
+        labels: {
+          color: 'rgba(0, 0, 0, 0.7)', // 凡例のテキスト色
+        },
+      },
+      tooltip: {
+        backgroundColor: 'rgba(0, 0, 0, 0.7)', // ツールチップの背景色
+        titleColor: '#fff', // ツールチップのタイトル色
+        bodyColor: '#fff', // ツールチップの本文色
+        borderColor: 'rgba(169, 169, 169, 0.5)', // ツールチップの枠線色
+        borderWidth: 1, // ツールチップの枠線の幅
       },
     },
   };
 
   return (
     <div className="text-center mb-8">
-      <p className="text-xl mb-4">Base Experience: {pokemon.base_experience}</p>
-      <p className="text-xl mb-4">Height: {pokemon.height}</p>
-      <p className="text-xl mb-4">Weight: {pokemon.weight}</p>
-      <p className="text-xl mb-4">
-        Abilities: {pokemon.abilities.map((ability) => ability.ability.name).join(', ')}
-      </p>
       <div className="mt-8">
-        <h2 className="text-2xl font-semibold">Stats</h2>
-        <div className="relative w-full h-64">
+        <h2 className="text-2xl font-semibold mb-4 text-gray-800">Stats</h2>
+        <div className="relative w-full h-[500px]">
+          {' '}
+          {/* サイズを大きくする */}
           <Radar data={data} options={options} />
         </div>
       </div>
