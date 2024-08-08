@@ -27,8 +27,6 @@ export default function PokemonList({ pokemons, page }: PokemonListProps) {
           <PokemonCard key={pokemon.name} pokemon={pokemon} />
         ))}
       </div>
-
-      <Pagination currentPage={page} />
     </div>
   );
 }

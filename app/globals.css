@@ -1,33 +1,46 @@
+/* styles/globals.css */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
+@keyframes underlineAnimation {
+  0% {
+    width: 0;
+  }
+  100% {
+    width: 100%;
   }
 }
 
-body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
+.pagination-link {
+  color: #d0d0d0; /* 数字の色（少し暗い白っぽい灰色） */
+  position: relative;
+  padding: 0.5rem 1rem; /* パディングを調整 */
+  text-decoration: none;
+  font-size: 1rem; /* 数字を少し細めに */
+  font-weight: 300; /* 数字を細く */
+  transition: color 0.3s ease;
 }
 
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
+.pagination-link::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 1px; /* 下線の高さを細く設定 */
+  background-color: #d0d0d0; /* 下線の色（少し暗い白っぽい灰色） */
+  width: 100%;
+  transform: scaleX(0);
+  transform-origin: bottom right;
+  transition: transform 0.3s ease;
+}
+
+.pagination-link:hover::after {
+  transform: scaleX(1);
+  transform-origin: bottom left;
+}
+
+.active::after {
+  transform: scaleX(1);
+  transform-origin: bottom left;
 }
