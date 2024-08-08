@@ -1,4 +1,3 @@
-// app/pokemon/[name]/page.tsx
 import Pokedex, { Pokemon, PokemonSpecies } from 'pokedex-promise-v2';
 import Image from 'next/image';
 import Header from '../../../components/Header';
@@ -56,7 +55,13 @@ async function fetchPokemonSpecies(url: string): Promise<PokemonSpecies> {
   return species;
 }
 
-export default async function PokemonDetailPage({ params }: { params: { name: string } }) {
+export default async function PokemonDetailPage({
+  params,
+  searchParams,
+}: {
+  params: { name: string };
+  searchParams: { page?: string };
+}) {
   const P = new Pokedex();
   const pokemon = await P.getPokemonByName(params.name);
   const species = await fetchPokemonSpecies(pokemon.species.url);
@@ -66,12 +71,11 @@ export default async function PokemonDetailPage({ params }: { params: { name: st
   const totalPokemonCount = await fetchTotalPokemonCount();
 
   const pokemonId = pokemon.id;
+  const previousPokemonId = pokemonId > 1 ? pokemonId - 1 : null;
+  const nextPokemonId = pokemonId < 10000 ? pokemonId + 1 : null;
 
-  const previousPokemonId = pokemonId > 1 ? pokemonId - 1 : totalPokemonCount;
-  const nextPokemonId = pokemonId < totalPokemonCount ? pokemonId + 1 : 1;
-
-  const previousPokemon = await fetchPokemonById(previousPokemonId);
-  const nextPokemon = await fetchPokemonById(nextPokemonId);
+  const previousPokemon = previousPokemonId ? await fetchPokemonById(previousPokemonId) : null;
+  const nextPokemon = nextPokemonId ? await fetchPokemonById(nextPokemonId) : null;
 
   const types = pokemon.types.map((typeInfo) => {
     const typeName = typeInfo.type.name;
@@ -79,15 +83,14 @@ export default async function PokemonDetailPage({ params }: { params: { name: st
     return { name: typeName, color };
   });
 
+  const currentPage = searchParams.page || '1'; // デフォルトページ番号を設定
+
   return (
     <>
       <Header />
       <div className="container mx-auto p-8 relative">
-        {/* 一覧に戻るボタン */}
-        <BackToListLink />
-
+        <BackToListLink currentPage={currentPage} />
         <div className="mt-16">
-          {/* 上部の余白を増やす */}
           <h1 className="text-4xl font-bold text-center mb-8">{japaneseName}</h1>
           {pokemon.sprites.front_default ? (
             <Image
@@ -112,7 +115,11 @@ export default async function PokemonDetailPage({ params }: { params: { name: st
             ))}
           </div>
           <PokemonStats pokemon={pokemon} />
-          <NavigationLinks previousPokemon={previousPokemon} nextPokemon={nextPokemon} />
+          <NavigationLinks
+            previousPokemon={previousPokemon}
+            nextPokemon={nextPokemon}
+            currentPage={currentPage}
+          />
         </div>
       </div>
     </>

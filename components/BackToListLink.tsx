@@ -2,11 +2,16 @@
 
 import { useRouter } from 'next/navigation';
 
-export default function BackToListLink() {
+interface BackToListLinkProps {
+  currentPage: string;
+}
+
+export default function BackToListLink({ currentPage }: BackToListLinkProps) {
   const router = useRouter();
 
   const handleBackClick = () => {
-    router.back(); // 前のページに戻る
+    // 現在のページ番号を保持して一覧ページに遷移
+    router.push(`/?page=${currentPage}`);
   };
 
   return (

@@ -1,4 +1,3 @@
-// components/PokemonCard.tsx
 'use client';
 
 import { useRouter } from 'next/navigation';
@@ -28,13 +27,14 @@ const typeColors: { [key: string]: string } = {
 
 interface PokemonCardProps {
   pokemon: Pokemon & { japaneseName: string };
+  currentPage: number; // page パラメータを追加
 }
 
-export default function PokemonCard({ pokemon }: PokemonCardProps) {
+export default function PokemonCard({ pokemon, currentPage }: PokemonCardProps) {
   const router = useRouter();
 
   const handleClick = () => {
-    router.push(`/pokemon/${pokemon.name}`);
+    router.push(`/pokemon/${pokemon.name}?page=${currentPage}`); // URL に page パラメータを追加
   };
 
   const types = pokemon.types.map((typeInfo) => {
