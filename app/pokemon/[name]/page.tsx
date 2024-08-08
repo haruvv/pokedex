@@ -1,52 +1,74 @@
-// src/app/pokemon/[name]/page.tsx
-import Pokedex, { Pokemon } from 'pokedex-promise-v2';
-import Link from 'next/link';
+import Pokedex, { Pokemon, PokemonSpecies } from 'pokedex-promise-v2';
+import Image from 'next/image';
+import BackToListLink from '../../../components/BackToListLink';
+import PokemonStats from '../../../components/PokemonStats';
+import NavigationLinks from '../../../components/NavigationLinks';
 
-async function fetchPokemonByName(name: string): Promise<Pokemon> {
+async function fetchTotalPokemonCount(): Promise<number> {
   const P = new Pokedex();
-  return P.getPokemonByName(name);
+  const allPokemons = await P.getPokemonsList({ limit: 1 });
+  return allPokemons.count;
+}
+
+async function fetchPokemonById(id: number): Promise<(Pokemon & { japaneseName: string }) | null> {
+  const P = new Pokedex();
+  try {
+    const pokemon = await P.getPokemonByName(id.toString());
+    const species = await fetchPokemonSpecies(pokemon.species.url);
+    const japaneseName =
+      species.names.find((name) => name.language.name === 'ja-Hrkt')?.name || pokemon.name;
+
+    return { ...pokemon, japaneseName };
+  } catch (error) {
+    return null;
+  }
+}
+
+async function fetchPokemonSpecies(url: string): Promise<PokemonSpecies> {
+  const response = await fetch(url);
+  if (!response.ok) {
+    throw new Error('Failed to fetch Pokemon species data');
+  }
+  const species: PokemonSpecies = await response.json();
+  return species;
 }
 
 export default async function PokemonDetailPage({ params }: { params: { name: string } }) {
-  const pokemon = await fetchPokemonByName(params.name);
+  const P = new Pokedex();
+  const pokemon = await P.getPokemonByName(params.name);
+  const species = await fetchPokemonSpecies(pokemon.species.url);
+  const japaneseName =
+    species.names.find((name) => name.language.name === 'ja-Hrkt')?.name || pokemon.name;
 
-  // 名前からポケモンのIDを取得
+  const totalPokemonCount = await fetchTotalPokemonCount();
+
   const pokemonId = pokemon.id;
 
-  // 前のポケモンと次のポケモンのIDを計算（ループするように調整）
-  const previousPokemonId = pokemonId > 1 ? pokemonId - 1 : 1010; // 最初のポケモンの場合は最後のポケモンへ
-  const nextPokemonId = pokemonId < 1010 ? pokemonId + 1 : 1; // 最後のポケモンの場合は最初のポケモンへ
+  const previousPokemonId = pokemonId > 1 ? pokemonId - 1 : totalPokemonCount;
+  const nextPokemonId = pokemonId < totalPokemonCount ? pokemonId + 1 : 1;
 
-  // 前のポケモンと次のポケモンの名前を取得
-  const previousPokemon = await fetchPokemonByName(previousPokemonId.toString());
-  const nextPokemon = await fetchPokemonByName(nextPokemonId.toString());
+  const previousPokemon = await fetchPokemonById(previousPokemonId);
+  const nextPokemon = await fetchPokemonById(nextPokemonId);
 
   return (
-    <div className="container mx-auto p-8">
-      <h1 className="text-4xl font-bold text-center mb-8">{pokemon.name}</h1>
+    <div className="container mx-auto p-8 relative">
+      <BackToListLink />
+
+      <h1 className="text-4xl font-bold text-center mb-8">{japaneseName}</h1>
       {pokemon.sprites.front_default ? (
-        <img src={pokemon.sprites.front_default} alt={pokemon.name} className="mx-auto mb-8" />
+        <Image
+          src={pokemon.sprites.front_default}
+          alt={japaneseName}
+          width={256}
+          height={256}
+          className="mx-auto mb-8"
+        />
       ) : (
         <div className="text-center mb-8">No Image Available</div>
       )}
-      <div className="text-center mb-8">
-        <p className="text-xl mb-4">Base Experience: {pokemon.base_experience}</p>
-        <p className="text-xl mb-4">Height: {pokemon.height}</p>
-        <p className="text-xl mb-4">Weight: {pokemon.weight}</p>
-        <p className="text-xl">
-          Abilities: {pokemon.abilities.map((ability) => ability.ability.name).join(', ')}
-        </p>
-      </div>
 
-      {/* 前のポケモンと次のポケモンへのリンク */}
-      <div className="flex justify-between mt-8">
-        <Link href={`/pokemon/${previousPokemon.name}`} className="text-blue-500 hover:underline">
-          Previous: {previousPokemon.name}
-        </Link>
-        <Link href={`/pokemon/${nextPokemon.name}`} className="text-blue-500 hover:underline">
-          Next: {nextPokemon.name}
-        </Link>
-      </div>
+      <PokemonStats pokemon={pokemon} />
+      <NavigationLinks previousPokemon={previousPokemon} nextPokemon={nextPokemon} />
     </div>
   );
 }
