@@ -76,6 +76,17 @@ async function getPokemonJapaneseName(englishName: string): Promise<string> {
   }
 }
 
+async function getAbilityJapaneseName(abilityName: string): Promise<string> {
+  try {
+    const ability = await P.getAbilityByName(abilityName);
+    const japaneseName = ability.names.find((name: any) => name.language.name === 'ja')?.name;
+    return japaneseName || abilityName;
+  } catch (error) {
+    console.error(`Error fetching Japanese name for ability ${abilityName}:`, error);
+    return abilityName;
+  }
+}
+
 export async function getPokemonDetails(id: number) {
   if (id > MAX_POKEMON_ID) {
     throw new Error('Invalid Pokemon ID');
@@ -95,6 +106,17 @@ export async function getPokemonDetails(id: number) {
       console.warn(`Could not fetch species info for Pokemon ${id}:`, speciesError);
     }
 
+    const abilitiesPromises = pokemon.abilities.map(async (ability: any) => {
+      const japaneseName = await getAbilityJapaneseName(ability.ability.name);
+      return {
+        name: ability.ability.name,
+        japaneseName: japaneseName,
+        isHidden: ability.is_hidden,
+      };
+    });
+
+    const abilities = await Promise.all(abilitiesPromises);
+
     return {
       id: pokemon.id,
       name: pokemon.name,
@@ -103,7 +125,15 @@ export async function getPokemonDetails(id: number) {
       height: pokemon.height,
       weight: pokemon.weight,
       types: pokemon.types.map((type: any) => type.type.name),
-      abilities: pokemon.abilities.map((ability: any) => ability.ability.name),
+      abilities: abilities,
+      stats: {
+        hp: pokemon.stats[0].base_stat,
+        attack: pokemon.stats[1].base_stat,
+        defense: pokemon.stats[2].base_stat,
+        specialAttack: pokemon.stats[3].base_stat,
+        specialDefense: pokemon.stats[4].base_stat,
+        speed: pokemon.stats[5].base_stat,
+      },
     };
   } catch (error) {
     console.error(`Error fetching details for Pokemon ${id}:`, error);

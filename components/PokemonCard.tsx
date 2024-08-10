@@ -1,9 +1,5 @@
-// components/PokemonCard.tsx
-'use client';
-
 import Link from 'next/link';
 import Image from 'next/image';
-import { useState } from 'react';
 import { getTypeColor } from '@/lib/typeColors';
 
 type PokemonCardProps = {
@@ -21,41 +17,37 @@ export default function PokemonCard({
   image,
   types = [],
 }: PokemonCardProps) {
-  const [imgSrc, setImgSrc] = useState(image);
-
-  const content = (
-    <div className="border rounded-lg p-4 hover:shadow-lg transition-shadow bg-white h-full flex flex-col items-center justify-center">
-      <Image
-        src={imgSrc}
-        alt={japaneseName || name}
-        width={120}
-        height={120}
-        className="mx-auto"
-        onError={() => setImgSrc('/path/to/fallback-image.png')}
-      />
-      <h2 className="text-center mt-2 text-sm sm:text-base font-semibold">
-        {japaneseName || name}
-      </h2>
-      <p className="text-center text-gray-500 text-xs sm:text-sm">No.{id}</p>
-      <div className="flex mt-2 space-x-1">
-        {types.map((type) => (
-          <span
-            key={type}
-            className="w-10 h-1 rounded-full"
-            style={{ backgroundColor: getTypeColor(type) }}
-          />
-        ))}
-      </div>
-    </div>
-  );
-
-  if (id >= 10000) {
-    return content;
-  }
-
   return (
     <Link href={`/pokemon/${id}`} className="block">
-      {content}
+      <div className="bg-white rounded-lg shadow-md hover:shadow-xl transition-shadow p-4 flex flex-col items-center">
+        <Image
+          src={image}
+          alt={japaneseName || name}
+          width={120}
+          height={120}
+          className="mx-auto w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32"
+          priority={id <= 20}
+          loading={id > 20 ? 'lazy' : undefined}
+        />
+        <h2 className="mt-2 text-base sm:text-lg font-semibold text-gray-800">
+          {japaneseName || name}
+        </h2>
+        <p className="text-xs sm:text-sm text-gray-500">#{id.toString().padStart(3, '0')}</p>
+        <div className="flex mt-2 space-x-1 flex-wrap justify-center">
+          {types.map((type) => {
+            const { background, text } = getTypeColor(type);
+            return (
+              <span
+                key={type}
+                className="px-2 py-1 text-xs rounded-full m-1"
+                style={{ backgroundColor: background, color: text }}
+              >
+                {type}
+              </span>
+            );
+          })}
+        </div>
+      </div>
     </Link>
   );
 }

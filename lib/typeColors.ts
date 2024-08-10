@@ -1,26 +1,24 @@
-// lib/typeColors.ts
-
-export const typeColors: { [key: string]: string } = {
-  normal: '#A8A77A',
-  fire: '#EE8130',
-  water: '#6390F0',
-  electric: '#F7D02C',
-  grass: '#7AC74C',
-  ice: '#96D9D6',
-  fighting: '#C22E28',
-  poison: '#A33EA1',
-  ground: '#E2BF65',
-  flying: '#A98FF3',
-  psychic: '#F95587',
-  bug: '#A6B91A',
-  rock: '#B6A136',
-  ghost: '#735797',
-  dragon: '#6F35FC',
-  dark: '#705746',
-  steel: '#B7B7CE',
-  fairy: '#D685AD',
+export const typeColors: { [key: string]: { background: string; text: string } } = {
+  normal: { background: '#A8A878', text: '#FFFFFF' },
+  fire: { background: '#F08030', text: '#FFFFFF' },
+  water: { background: '#6890F0', text: '#FFFFFF' },
+  electric: { background: '#F8D030', text: '#000000' },
+  grass: { background: '#78C850', text: '#FFFFFF' },
+  ice: { background: '#98D8D8', text: '#000000' },
+  fighting: { background: '#C03028', text: '#FFFFFF' },
+  poison: { background: '#A040A0', text: '#FFFFFF' },
+  ground: { background: '#E0C068', text: '#000000' },
+  flying: { background: '#A890F0', text: '#000000' },
+  psychic: { background: '#F85888', text: '#FFFFFF' },
+  bug: { background: '#A8B820', text: '#FFFFFF' },
+  rock: { background: '#B8A038', text: '#FFFFFF' },
+  ghost: { background: '#705898', text: '#FFFFFF' },
+  dragon: { background: '#7038F8', text: '#FFFFFF' },
+  dark: { background: '#705848', text: '#FFFFFF' },
+  steel: { background: '#B8B8D0', text: '#000000' },
+  fairy: { background: '#EE99AC', text: '#000000' },
 };
 
-export function getTypeColor(type: string): string {
-  return typeColors[type.toLowerCase()] || '#777777'; // デフォルト色
+export function getTypeColor(type: string): { background: string; text: string } {
+  return typeColors[type.toLowerCase()] || { background: '#68A090', text: '#FFFFFF' };
 }

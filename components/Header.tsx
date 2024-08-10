@@ -2,12 +2,17 @@ import Link from 'next/link';
 
 export default function Header() {
   return (
-    <header className="bg-red-500 text-white p-4">
+    <header className="bg-black text-white p-4 shadow-md">
       <div className="container mx-auto flex justify-between items-center">
-        <h1 className="text-2xl font-bold">ポケモン図鑑</h1>
+        <Link
+          href="/"
+          className="text-2xl font-bold tracking-wider hover:text-gray-300 transition-colors"
+        >
+          POKÉDEX
+        </Link>
         <nav>
-          <Link href="/" className="hover:underline">
-            ホーム
+          <Link href="/" className="hover:text-gray-300 transition-colors">
+            Home
           </Link>
         </nav>
       </div>
