@@ -16,7 +16,7 @@ export default function PokemonList({ pokemons, page }: PokemonListProps) {
       const img = new Image();
       img.src = pokemon.sprites.front_default || '';
     });
-  }, [pokemons]); // useEffect の閉じ括弧とセミコロン
+  }, [pokemons]);
 
   return (
     <div className="container mx-auto">

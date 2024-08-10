@@ -63,6 +63,7 @@ export default function PokemonCard({ pokemon, currentPage }: PokemonCardProps) 
       )}
       <h2 className="text-lg font-light text-center mb-2 font-sans text-gray-800">
         {pokemon.japaneseName}
+        {pokemon.order}
       </h2>
       <div className="flex flex-wrap justify-center gap-2">
         {types.map((type) => (
