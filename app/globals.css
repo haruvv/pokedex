@@ -1,0 +1,38 @@
+/* app/globals.css */
+
+/* Tailwind のディレクティブ */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* カスタムフォントの設定（必要な場合） */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap');
+
+/* グローバルスタイル */
+body {
+  font-family: 'Noto Sans JP', sans-serif;
+  @apply bg-gray-100 text-gray-900;
+}
+
+/* カスタムユーティリティクラス */
+@layer utilities {
+  .text-shadow {
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+  }
+}
+
+/* カスタムコンポーネントスタイル */
+@layer components {
+  .btn-primary {
+    @apply px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors;
+  }
+}
+
+/* その他のカスタムスタイル */
+.pokemon-card {
+  transition: transform 0.2s ease-in-out;
+}
+
+.pokemon-card:hover {
+  transform: scale(1.05);
+}
