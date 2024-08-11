@@ -3,14 +3,6 @@ import Pokedex from 'pokedex-promise-v2';
 const P = new Pokedex();
 export const MAX_POKEMON_ID = 1025;
 
-interface PokemonBasicInfo {
-  id: number;
-  name: string;
-  japaneseName: string;
-  image: string;
-  types: string[];
-}
-
 interface EvolutionDetail {
   name: string;
   image: string;
@@ -22,28 +14,95 @@ interface EvolutionChain {
   evolutions: EvolutionDetail[];
 }
 
-export async function getPokemonList(
+interface Generation {
+  id: number;
+  name: string;
+  pokemonSpecies: { name: string; url: string }[];
+}
+
+export async function getGenerations(): Promise<Generation[]> {
+  try {
+    const response = await P.getGenerationsList();
+    const generations = await Promise.all(
+      response.results.map(async (gen: any) => {
+        const genData = await P.getGenerationByName(gen.name);
+        return {
+          id: genData.id,
+          name: genData.names.find((name: any) => name.language.name === 'en')?.name || gen.name,
+          pokemonSpecies: genData.pokemon_species,
+        };
+      })
+    );
+    return generations;
+  } catch (error) {
+    console.error('Error fetching generations:', error);
+    return [];
+  }
+}
+
+export async function getPokemonListByGeneration(
+  generationId: number,
   page: number,
   limit: number = 20
 ): Promise<{ pokemonList: PokemonBasicInfo[]; totalCount: number }> {
-  const offset = (page - 1) * limit;
   try {
-    let results: { name: string }[];
-    let count;
+    const pokemonRange = getPokemonRangeForGeneration(generationId);
+    const start = (page - 1) * limit + pokemonRange.start;
+    const end = Math.min(start + limit, pokemonRange.end + 1); // +1 を追加
 
-    if (offset < MAX_POKEMON_ID) {
-      const response = await P.getPokemonsList({
-        limit: Math.min(limit, MAX_POKEMON_ID - offset),
-        offset,
-      });
-      results = response.results;
-      count = response.count;
-    } else {
-      results = [];
-      count = MAX_POKEMON_ID;
+    const pokemonPromises = [];
+    for (let i = start; i < end; i++) {
+      pokemonPromises.push(getPokemonBasicInfo(i));
     }
 
-    const pokemonPromises = results.map(getPokemonBasicInfo);
+    const pokemonList = await Promise.all(pokemonPromises);
+    return { pokemonList, totalCount: pokemonRange.end - pokemonRange.start + 1 };
+  } catch (error) {
+    console.error('Error fetching Pokemon list by generation:', error);
+    return { pokemonList: [], totalCount: 0 };
+  }
+}
+
+export function getPokemonRangeForGeneration(generationId: number): { start: number; end: number } {
+  switch (generationId) {
+    case 1:
+      return { start: 1, end: 151 };
+    case 2:
+      return { start: 152, end: 251 };
+    case 3:
+      return { start: 252, end: 386 };
+    case 4:
+      return { start: 387, end: 493 };
+    case 5:
+      return { start: 494, end: 649 };
+    case 6:
+      return { start: 650, end: 721 };
+    case 7:
+      return { start: 722, end: 809 };
+    case 8:
+      return { start: 810, end: 905 };
+    case 9:
+      return { start: 906, end: MAX_POKEMON_ID };
+    default:
+      return { start: 1, end: MAX_POKEMON_ID };
+  }
+}
+
+export async function getPokemonList(
+  page: number,
+  limit: number = 20,
+  generationId: number | null = null
+): Promise<{ pokemonList: PokemonBasicInfo[]; totalCount: number }> {
+  try {
+    if (generationId) {
+      return getPokemonListByGeneration(generationId, page, limit);
+    }
+
+    const offset = (page - 1) * limit;
+    const { results, count } = await P.getPokemonsList({ limit, offset });
+    const pokemonPromises = results
+      .filter((_, index) => offset + index < MAX_POKEMON_ID)
+      .map((result) => getPokemonBasicInfo(result.name));
     const pokemonList = await Promise.all(pokemonPromises);
     return { pokemonList, totalCount: Math.min(count, MAX_POKEMON_ID) };
   } catch (error) {
@@ -52,24 +111,25 @@ export async function getPokemonList(
   }
 }
 
-async function getPokemonBasicInfo(result: { name: string }): Promise<PokemonBasicInfo> {
+async function getPokemonBasicInfo(nameOrId: string | number): Promise<PokemonBasicInfo> {
   try {
-    const pokemon = await P.getPokemonByName(result.name);
-    const japaneseName = await getPokemonJapaneseName(result.name);
+    const pokemon = await P.getPokemonByName(nameOrId);
+    const species = await P.getPokemonSpeciesByName(pokemon.id);
 
     return {
       id: pokemon.id,
       name: pokemon.name,
-      japaneseName,
+      japaneseName:
+        species.names.find((name: any) => name.language.name === 'ja')?.name || pokemon.name,
       image: pokemon.sprites.front_default || '/path/to/fallback-image.png',
       types: pokemon.types.map((type: any) => type.type.name),
     };
   } catch (error) {
-    console.error(`Error fetching info for Pokemon ${result.name}:`, error);
+    console.error(`Error fetching info for Pokemon ${nameOrId}:`, error);
     return {
       id: 0,
-      name: result.name,
-      japaneseName: '日本語名が見つかりません。',
+      name: typeof nameOrId === 'string' ? nameOrId : '',
+      japaneseName: '',
       image: '/path/to/fallback-image.png',
       types: [],
     };
@@ -208,4 +268,12 @@ export async function getAdjacentPokemonNames(
   ]);
 
   return { prev: prevName, next: nextName };
+}
+
+export interface PokemonBasicInfo {
+  id: number;
+  name: string;
+  japaneseName: string;
+  image: string;
+  types: string[];
 }

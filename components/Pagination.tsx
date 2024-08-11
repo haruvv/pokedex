@@ -1,11 +1,10 @@
-import Link from 'next/link';
-
 type PaginationProps = {
   currentPage: number;
   totalPages: number;
+  onPageChange: (page: number) => void;
 };
 
-export default function Pagination({ currentPage, totalPages }: PaginationProps) {
+export default function Pagination({ currentPage, totalPages, onPageChange }: PaginationProps) {
   const pageNumbers = [];
   const maxVisiblePages = 5;
   let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
@@ -20,64 +19,41 @@ export default function Pagination({ currentPage, totalPages }: PaginationProps)
   }
 
   return (
-    <nav className="flex justify-center items-center space-x-2 mt-12">
-      <Link
-        href="/?page=1"
-        className={`w-10 h-10 flex items-center justify-center rounded-full border ${
-          currentPage === 1
-            ? 'border-gray-300 text-gray-300 cursor-not-allowed'
-            : 'border-black text-black hover:bg-black hover:text-white transition-colors'
+    <nav className="flex justify-center items-center space-x-2 mt-8">
+      {/* 前のページボタン */}
+      <button
+        onClick={() => onPageChange(Math.max(1, currentPage - 1))}
+        disabled={currentPage === 1}
+        className={`px-3 py-2 rounded ${
+          currentPage === 1 ? 'bg-gray-200 text-gray-500' : 'bg-blue-500 text-white'
         }`}
-        aria-disabled={currentPage === 1}
-      >
-        &lt;&lt;
-      </Link>
-      <Link
-        href={`/?page=${Math.max(1, currentPage - 1)}`}
-        className={`w-10 h-10 flex items-center justify-center rounded-full border ${
-          currentPage === 1
-            ? 'border-gray-300 text-gray-300 cursor-not-allowed'
-            : 'border-black text-black hover:bg-black hover:text-white transition-colors'
-        }`}
-        aria-disabled={currentPage === 1}
       >
         &lt;
-      </Link>
+      </button>
+
+      {/* ページ番号 */}
       {pageNumbers.map((number) => (
-        <Link
+        <button
           key={number}
-          href={`/?page=${number}`}
-          className={`w-10 h-10 flex items-center justify-center rounded-full border ${
-            currentPage === number
-              ? 'bg-black text-white border-black'
-              : 'border-gray-300 text-gray-700 hover:border-black hover:text-black transition-colors'
+          onClick={() => onPageChange(number)}
+          className={`px-3 py-2 rounded ${
+            currentPage === number ? 'bg-blue-600 text-white' : 'bg-blue-500 text-white'
           }`}
         >
           {number}
-        </Link>
+        </button>
       ))}
-      <Link
-        href={`/?page=${Math.min(totalPages, currentPage + 1)}`}
-        className={`w-10 h-10 flex items-center justify-center rounded-full border ${
-          currentPage === totalPages
-            ? 'border-gray-300 text-gray-300 cursor-not-allowed'
-            : 'border-black text-black hover:bg-black hover:text-white transition-colors'
+
+      {/* 次のページボタン */}
+      <button
+        onClick={() => onPageChange(Math.min(totalPages, currentPage + 1))}
+        disabled={currentPage === totalPages}
+        className={`px-3 py-2 rounded ${
+          currentPage === totalPages ? 'bg-gray-200 text-gray-500' : 'bg-blue-500 text-white'
         }`}
-        aria-disabled={currentPage === totalPages}
       >
         &gt;
-      </Link>
-      <Link
-        href={`/?page=${totalPages}`}
-        className={`w-10 h-10 flex items-center justify-center rounded-full border ${
-          currentPage === totalPages
-            ? 'border-gray-300 text-gray-300 cursor-not-allowed'
-            : 'border-black text-black hover:bg-black hover:text-white transition-colors'
-        }`}
-        aria-disabled={currentPage === totalPages}
-      >
-        &gt;&gt;
-      </Link>
+      </button>
     </nav>
   );
 }

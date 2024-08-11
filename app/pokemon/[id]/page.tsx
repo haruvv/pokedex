@@ -16,8 +16,16 @@ export async function generateStaticParams() {
   return params;
 }
 
-export default async function PokemonDetail({ params }: { params: { id: string } }) {
+export default async function PokemonDetail({
+  params,
+  searchParams,
+}: {
+  params: { id: string };
+  searchParams: { generation?: string; page?: string };
+}) {
   const id = parseInt(params.id, 10);
+  const generation = searchParams.generation;
+  const page = searchParams.page || '1'; // デフォルトを1ページ目にします
 
   if (isNaN(id) || id < 1 || id > MAX_POKEMON_ID) {
     notFound();
@@ -26,13 +34,12 @@ export default async function PokemonDetail({ params }: { params: { id: string }
   try {
     const pokemon = await getPokemonDetails(id);
     const { prev, next } = await getAdjacentPokemonNames(id);
-    const listPage = calculateListPage(id);
 
     return (
       <div className="container mx-auto p-4 relative">
         <Link
-          href={`/?page=${listPage}`}
-          className="absolute top-4 right-4 bg-black text-white px-3 py-1 text-sm sm:px-4 sm:py-2 sm:text-base rounded hover:bg-gray-800 transition-colors"
+          href={`/?page=${page}${generation ? `&generation=${generation}` : ''}`}
+          className="absolute top-4 right-4 bg-black text-white px-4 py-2 rounded hover:bg-gray-800 transition-colors"
         >
           Back to List
         </Link>
@@ -44,10 +51,14 @@ export default async function PokemonDetail({ params }: { params: { id: string }
               <StatsChart stats={pokemon.stats} />
             </div>
           </div>
-          <EvolutionChain
-            base={pokemon.evolutionChain.base}
-            evolutions={pokemon.evolutionChain.evolutions}
-          />
+          <div className="mt-8">
+            <div className="overflow-x-auto sm:overflow-x-visible -mx-4 px-4 sm:mx-0 sm:px-0">
+              <EvolutionChain
+                base={pokemon.evolutionChain.base}
+                evolutions={pokemon.evolutionChain.evolutions}
+              />
+            </div>
+          </div>
         </div>
         <div className="mt-8 flex justify-between items-center">
           <div className="w-1/3">

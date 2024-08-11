@@ -1,37 +1,35 @@
-import { getPokemonList, MAX_POKEMON_ID } from '@/lib/pokeapi';
-import PokemonCard from '@/components/PokemonCard';
-import Pagination from '@/components/Pagination';
+// app/page.tsx
+import { Suspense } from 'react';
+import { getGenerations, getPokemonList, MAX_POKEMON_ID } from '@/lib/pokeapi';
+import PokemonList from '@/components/PokemonList';
 
-const ITEMS_PER_PAGE = 24; // 1ページあたりのポケモン数を24に調整
+const ITEMS_PER_PAGE = 24;
 
-export const revalidate = 3600; // 1時間ごとに再生成
+export default async function Home({
+  searchParams,
+}: {
+  searchParams: { page?: string; generation?: string };
+}) {
+  const page = parseInt(searchParams.page || '1', 10);
+  const generationId = searchParams.generation ? parseInt(searchParams.generation, 10) : null;
 
-export default async function Home({ searchParams }: { searchParams: { page?: string } }) {
-  const page = Math.max(1, parseInt(searchParams.page || '1', 10));
-  const { pokemonList, totalCount } = await getPokemonList(page, ITEMS_PER_PAGE);
-  const totalPages = Math.ceil(MAX_POKEMON_ID / ITEMS_PER_PAGE);
-  const currentPage = Math.min(page, totalPages);
+  const generations = await getGenerations();
+  const { pokemonList, totalCount } = await getPokemonList(page, ITEMS_PER_PAGE, generationId);
 
   return (
     <main className="container mx-auto px-4 py-8">
       <h1 className="text-3xl sm:text-4xl font-bold mb-8 text-center text-gray-800">
         Pokémon Directory
       </h1>
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 sm:gap-6">
-        {pokemonList.map((pokemon) => (
-          <PokemonCard
-            key={pokemon.id}
-            id={pokemon.id}
-            name={pokemon.name}
-            japaneseName={pokemon.japaneseName}
-            image={pokemon.image}
-            types={pokemon.types || []}
-          />
-        ))}
-      </div>
-      <div className="mt-8">
-        <Pagination currentPage={currentPage} totalPages={totalPages} />
-      </div>
+      <Suspense fallback={<div>Loading...</div>}>
+        <PokemonList
+          initialPokemonList={pokemonList}
+          initialTotalCount={totalCount}
+          generations={generations}
+          initialPage={page}
+          itemsPerPage={ITEMS_PER_PAGE}
+        />
+      </Suspense>
     </main>
   );
 }
