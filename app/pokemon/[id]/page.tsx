@@ -4,8 +4,9 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import PokemonInfo from '@/components/PokemonInfo';
 import StatsChart from '@/components/StatsChart';
+import EvolutionChain from '@/components/EvolutionChain';
 
-export const revalidate = 86400; // 24時間ごとに再生成
+export const dynamicParams = true;
 
 export async function generateStaticParams() {
   const params = [];
@@ -14,6 +15,7 @@ export async function generateStaticParams() {
   }
   return params;
 }
+
 export default async function PokemonDetail({ params }: { params: { id: string } }) {
   const id = parseInt(params.id, 10);
 
@@ -34,14 +36,18 @@ export default async function PokemonDetail({ params }: { params: { id: string }
         >
           Back to List
         </Link>
-        <div className="bg-white rounded-lg shadow-lg p-4 sm:p-6 md:p-8 mt-16">
+        <div className="bg-white rounded-lg shadow-lg p-8 mt-16">
           <PokemonInfo pokemon={pokemon} />
           <div className="mt-8">
-            <h2 className="text-xl sm:text-2xl font-bold mb-4">Base Stats</h2>
+            <h2 className="text-2xl font-bold mb-4">Base Stats</h2>
             <div className="flex justify-center">
               <StatsChart stats={pokemon.stats} />
             </div>
           </div>
+          <EvolutionChain
+            base={pokemon.evolutionChain.base}
+            evolutions={pokemon.evolutionChain.evolutions}
+          />
         </div>
         <div className="mt-8 flex justify-between items-center">
           <div className="w-1/3">

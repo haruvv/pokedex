@@ -2,7 +2,7 @@ import { getPokemonList, MAX_POKEMON_ID } from '@/lib/pokeapi';
 import PokemonCard from '@/components/PokemonCard';
 import Pagination from '@/components/Pagination';
 
-const ITEMS_PER_PAGE = 20;
+const ITEMS_PER_PAGE = 24; // 1ページあたりのポケモン数を24に調整
 
 export const revalidate = 3600; // 1時間ごとに再生成
 
@@ -17,7 +17,7 @@ export default async function Home({ searchParams }: { searchParams: { page?: st
       <h1 className="text-3xl sm:text-4xl font-bold mb-8 text-center text-gray-800">
         Pokémon Directory
       </h1>
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 sm:gap-6">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 sm:gap-6">
         {pokemonList.map((pokemon) => (
           <PokemonCard
             key={pokemon.id}
@@ -29,7 +29,9 @@ export default async function Home({ searchParams }: { searchParams: { page?: st
           />
         ))}
       </div>
-      <Pagination currentPage={currentPage} totalPages={totalPages} />
+      <div className="mt-8">
+        <Pagination currentPage={currentPage} totalPages={totalPages} />
+      </div>
     </main>
   );
 }

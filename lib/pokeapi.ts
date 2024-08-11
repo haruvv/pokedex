@@ -11,6 +11,17 @@ interface PokemonBasicInfo {
   types: string[];
 }
 
+interface EvolutionDetail {
+  name: string;
+  image: string;
+  id: number;
+}
+
+interface EvolutionChain {
+  base: EvolutionDetail;
+  evolutions: EvolutionDetail[];
+}
+
 export async function getPokemonList(
   page: number,
   limit: number = 20
@@ -87,6 +98,48 @@ async function getAbilityJapaneseName(abilityName: string): Promise<string> {
   }
 }
 
+async function getEvolutionChain(id: number): Promise<EvolutionChain> {
+  try {
+    const pokemon = await P.getPokemonSpeciesByName(id);
+    const evolutionChainResponse = await fetch(pokemon.evolution_chain.url);
+    const evolutionChain = await evolutionChainResponse.json();
+
+    const baseSpecies = await P.getPokemonSpeciesByName(evolutionChain.chain.species.name);
+    const basePokemon = await P.getPokemonByName(baseSpecies.id);
+
+    const base: EvolutionDetail = {
+      name:
+        baseSpecies.names.find((name: any) => name.language.name === 'ja')?.name ||
+        baseSpecies.name,
+      image: basePokemon.sprites.front_default || '/path/to/fallback-image.png', // フォールバック画像を追加
+      id: baseSpecies.id,
+    };
+
+    const evolutions: EvolutionDetail[] = [];
+
+    const traverseEvolutionChain = async (chain: any): Promise<void> => {
+      for (const evolution of chain.evolves_to) {
+        const species = await P.getPokemonSpeciesByName(evolution.species.name);
+        const pokemon = await P.getPokemonByName(species.id);
+        evolutions.push({
+          name:
+            species.names.find((name: any) => name.language.name === 'ja')?.name || species.name,
+          image: pokemon.sprites.front_default || '/path/to/fallback-image.png', // フォールバック画像を追加
+          id: species.id,
+        });
+        await traverseEvolutionChain(evolution);
+      }
+    };
+
+    await traverseEvolutionChain(evolutionChain.chain);
+
+    return { base, evolutions };
+  } catch (error) {
+    console.error('Error fetching evolution chain:', error);
+    throw error;
+  }
+}
+
 export async function getPokemonDetails(id: number) {
   if (id > MAX_POKEMON_ID) {
     throw new Error('Invalid Pokemon ID');
@@ -116,6 +169,7 @@ export async function getPokemonDetails(id: number) {
     });
 
     const abilities = await Promise.all(abilitiesPromises);
+    const evolutionChain = await getEvolutionChain(id);
 
     return {
       id: pokemon.id,
@@ -126,6 +180,7 @@ export async function getPokemonDetails(id: number) {
       weight: pokemon.weight,
       types: pokemon.types.map((type: any) => type.type.name),
       abilities: abilities,
+      evolutionChain,
       stats: {
         hp: pokemon.stats[0].base_stat,
         attack: pokemon.stats[1].base_stat,
